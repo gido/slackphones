@@ -25,7 +25,35 @@ app.post('/slack/telephones', function (req, res) {
     return res.status(401).send('Unauthorized Slack account');
   }
 
-  res.status(200).send('Super !');
+  let phones = [
+    {
+      'name': 'Gilles',
+      'shortPhone': 22,
+      'online': true,
+    }
+  ];
+
+
+  const fields = phones.map(function(phone) {
+    const onlineEmoji = phone.online ? ":white_check_mark:" : ':x:';
+    return {
+      'title': phone.name,
+      'value': `${phone.shortPhone} ${onlineEmoji}`,
+      'short': true,
+    }
+  });
+
+  const attachments = {
+    "attachments": [
+        {
+            "text": "Liste des numéros de téléphone:",
+            "fields": fields,
+            "color": "#F35A00"
+        }
+    ]
+}
+
+  res.status(200).set('Content-Type', 'application/json').send(JSON.stringify(attachments));
 });
 
 app.get('/health_check', function (req, res) {
