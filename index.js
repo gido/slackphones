@@ -1,6 +1,7 @@
 require('dotenv').load();
 
 var express = require('express');
+var request = require("request-with-cookies");
 
 var app = express();
 
@@ -18,7 +19,13 @@ app.get('/', function (req, res) {
 
 app.post('/slack/telephones', function (req, res) {
 
-    res.set('Content-Type', 'text/xml').status(200).send(message.toString());
+  console.log(req.body);
+
+  if (req.body.token !== process.env.SLACK_TOKEN) {
+    return res.status(401).send('Unauthorized Slack account');
+  }
+
+  res.status(200).send('Super !');
 });
 
 app.get('/health_check', function (req, res) {
