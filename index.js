@@ -54,23 +54,21 @@ function fetchPhoneNumbers(callback) {
   });
 }
 
-app.get('/', function (req, res) {
-  res.send('hi!');
-});
+function buildAndSendDelayedResponseToSlack(responseUrl) {
 
-app.post('/slack/telephones', function (req, res) {
-
-  if (req.body.token !== process.env.SLACK_TOKEN) {
-    return res.status(401).send('Unauthorized Slack account');
-  }
-
-  const client = request.createClient();
+  const client = request.createClient({ followRedirect: false, followAllRedirects: false });
 
   // Fetch the csrf token
   fetchPhoneNumbers(function (err, phones) {
 
     if (err) {
-      res.status(500).send('Error while fetching phone data: ' + err);
+      client.post({
+        uri: responseUrl,
+        json: {
+          response_type: "ephemeral",
+          text: 'Error while fetching phone data: ' + err
+        }
+      });
       return;
     }
 
@@ -94,8 +92,37 @@ app.post('/slack/telephones', function (req, res) {
       ]
     };
 
-    res.status(200).set('Content-Type', 'application/json').send(JSON.stringify(attachments));
+    client.post({
+      uri: responseUrl,
+      json: attachments
+    });
   });
+
+}
+
+app.get('/', function (req, res) {
+  res.send('hi!');
+});
+
+app.post('/slack/telephones', function (req, res) {
+
+  if (req.body.token !== process.env.SLACK_TOKEN) {
+    return res.status(401).send('Unauthorized Slack account');
+  }
+
+  const responseUrl = req.body.response_url;
+  const attachments = {
+    "response_type": "ephemeral",
+    "text": "wait two second, I'm searching in the phonebooks..."
+  };
+
+  // immediately respond to Slack.
+  res.status(200).set('Content-Type', 'application/json').send(JSON.stringify(attachments));
+
+  // fetch data and respond with a deplayed response.
+  setTimeout(function () {
+    buildAndSendDelayedResponseToSlack(responseUrl);
+  }, 0);
 });
 
 app.get('/health_check', function (req, res) {
