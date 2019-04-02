@@ -9,7 +9,7 @@
     "dotenv": "^4.0.0",
     "express": "^4.16.2",
     "forever": "^0.15.4",
-    "request-with-cookies": "git+ssh://@github.com:gido/request-with-cookies.git"
+    "request-with-cookies": "git+https://gido@github.com/gido/request-with-cookies.git"
   },
   "devDependencies": {},
   "scripts": {
