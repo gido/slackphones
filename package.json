@@ -7,7 +7,7 @@
     "body-parser": "^1.18.2",
     "cheerio": "^1.0.0-rc.2",
     "dotenv": "^4.0.0",
-    "express": "^4.16.2",
+    "express": "^4.17.3",
     "forever": "^2.0.0",
     "request-with-cookies": "git+https://gido@github.com/gido/request-with-cookies.git#653c9d325f8"
   },
